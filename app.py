@@ -5,7 +5,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 from nba_api.stats.static import *
 
-'''
+
 
 teamlist = teams.get_teams()
 playerlist = players.get_players()
@@ -40,4 +40,3 @@ def setDropDown(selection):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
-'''
