@@ -5,6 +5,7 @@ import dash_html_components as html
 from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output
 from nba_api.stats.static import *
+import nba
 
 
 
@@ -48,8 +49,12 @@ app.layout = html.Div([
             },
             values = []),
 
-         html.Button("Graph", id="graph"),
-         html.Div(id='body-div')
+         html.Button("Graph", id="graph_btn"),
+
+         dcc.Graph(id='graph')
+
+
+
 
 ])
 
@@ -75,19 +80,40 @@ def setDropDown(selection):
 
 
 @app.callback(
-    Output('body-div', 'children'),
-    [Input('graph', 'n_clicks')]
+    Output('graph', 'figure'),
+    [Input('graph_btn', 'n_clicks')]
 )
 def graphStats(n_clicks):
     if n_clicks is None:
         raise PreventUpdate
     else:
-        return "Elephants are the only animal that can't jump"
+        cleveland = nba.Team("cle")
+        toronto = nba.Team("toronto")
+        stats = [cleveland.get_stats("WINS", '2005', '2019')]
+        stats.append(toronto.get_stats("WINS", '2006', '2019'))
+        stat = "WINS"
+        traces = []
+        for i in stats:
+            traces.append(dict(
+                    x = str(i.index),
+                    y = i,
+                    name = "Test"
+
+             ))
+
+        return {
+           "data": traces,
+
+            'layout': dict(
+                xaxis={'title':'Range'},
+                yaxis={'title': stat},
+                title=stat,
+                showlegend=True
+
+             )
 
 
-
-
-
+        }
 
 if __name__ == '__main__':
     app.run_server(debug=True)
