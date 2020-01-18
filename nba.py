@@ -6,12 +6,10 @@ from nba_api.stats.static import *
 
 class Team:
 
-    def __init__(self, name):
-        self.search_name = name
-        self.team = teams.find_teams_by_full_name(self.search_name)[0]
-        self.teamid = self.team['id']
-        self.teamname = self.team['nickname']
-        self.teamstats = teamyearbyyearstats.TeamYearByYearStats(self.teamid).get_data_frames()[0]
+    def __init__(self, id):
+        self.dict = teams.find_team_name_by_id(id)
+        self.name = self.dict['nickname']
+        self.teamstats = teamyearbyyearstats.TeamYearByYearStats(id).get_data_frames()[0]
 
     def get_stats(self, stat, start, end):
         stats_in_range = self.teamstats[self.teamstats['YEAR'] <= end]
@@ -21,12 +19,10 @@ class Team:
 
 class Player:
 
-    def __init__(self, name):
-        self.search_name = name
-        self.player = players.find_players_by_full_name(self.search_name)[0]
-        self.playerid = self.player['id']
-        self.playername = self.player['full_name']
-        self.playerstats = playercareerstats.PlayerCareerStats(self.playerid).get_data_frames()[0]
+    def __init__(self, id):
+        self.dict = players.find_player_by_id(id)
+        self.name = self.dict['full_name']
+        self.playerstats = playercareerstats.PlayerCareerStats(id).get_data_frames()[0]
 
     def get_stats(self, stat, start, end):
         stats_in_range = self.playerstats[self.playerstats['SEASON_ID'] <= end]
