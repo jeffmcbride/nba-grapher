@@ -91,8 +91,6 @@ app.layout = html.Div([
                    labelStyle={'display': 'inline-block',
                    'margin-right': 10}),
     dcc.Dropdown(id='drop1', multi=False),
-    dcc.Dropdown(id='drop2', multi=False),
-    dcc.Dropdown(id='drop3', multi=False),
     dcc.Checklist(id='stats', labelStyle={'margin-right': '10',
                   'display': 'inline-block'}, values=[]),
     html.Button('Graph', id='graph_btn'),
@@ -102,21 +100,15 @@ app.layout = html.Div([
 
 @app.callback(
         [Output('drop1', 'options'),
-         Output('drop2', 'options'),
-         Output('drop3', 'options'),
          Output('stats', 'options')],
          [Input('teamplayer', 'value')])
 def setDropDown(selection):
     if selection == 'team':
         return ([{'label': i['full_name'], 'value': i['id']} for i in teamlist],
-                [{'label': i['full_name'], 'value': i['id']} for i in teamlist],
-                [{'label': i['full_name'], 'value': i['id']} for i in teamlist],
                 [{'label': i[2:], 'value': i} for i in team_stats])
     else:
 
         return ([{'label': i['full_name'], 'value': i['id']} for i in playerlist],
-                [{'label': i['full_name'], 'value': i['id']} for i in playerlist],
-                [{'label': i['full_name'], 'value': i['id']} for i in playerlist],
                 [{'label': i[2:], 'value': i} for i in player_stats])
 
 
@@ -124,10 +116,9 @@ def setDropDown(selection):
         Output('container', 'children'),
         [Input('graph_btn','n_clicks'),
          Input('drop1', 'value'),
-         Input('drop2', 'value'),
          Input('stats','values'),
          Input('teamplayer', 'value')])
-def graphStats(n_clicks, id, id2, stat_list, teamplayer):
+def graphStats(n_clicks, id, stat_list, teamplayer):
     global clicks
     if n_clicks == clicks or n_clicks is None:
         raise PreventUpdate
@@ -136,12 +127,11 @@ def graphStats(n_clicks, id, id2, stat_list, teamplayer):
 
         if (teamplayer == 'team'):
             id1 = nba.Team(id)
-            id2 = nba.Team(id2)
         else:
             id1 = nba.Player(id)
-            id2 = nba.Player(id2)
 
-        objects = [id1, id2]
+
+        objects = [id1]
         graphs = []
         for j in stat_list:
             traces = []
