@@ -5,13 +5,14 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.exceptions import PreventUpdate
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from nba_api.stats.static import *
 import nba
 
 teamlist = teams.get_teams()
 playerlist = players.get_players()
 clicks = 0
+counter = 1
 
 team_stats = [
     't_TEAM_ID',
@@ -50,6 +51,8 @@ team_stats = [
     't_PTS_RANK',
     ]
 
+team_stats.sort()
+
 player_stats = [
     'p_PLAYER_ID',
     'p_SEASON_ID',
@@ -80,6 +83,7 @@ player_stats = [
     'p_PTS',
     ]
 
+player_stats.sort()
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -90,12 +94,39 @@ app.layout = html.Div([
                    'value': 'player'}], value='team',
                    labelStyle={'display': 'inline-block',
                    'margin-right': 10}),
-    dcc.Dropdown(id='drop1', multi=False),
-    dcc.Checklist(id='stats', labelStyle={'margin-right': '10',
-                  'display': 'inline-block'}, values=[]),
-    html.Button('Graph', id='graph_btn'),
+    html.Div([html.Label('Team', style={'display': 'inline-block', 'margin-right':'10'}),
+            dcc.Dropdown(id='drop1', multi=False, style={'margin-right': '35','display': 'inline-block', 'width':'300'}),
+            html.Label('Start Date', style={'display': 'inline-block', 'margin-right':'10'}),
+            dcc.Dropdown(id='startdate1', options=[{'label':x, 'value': x} for x in range(1946, 2020)], style={'margin-right': '10','display': 'inline-block', 'width':'150'}),
+            html.Label('End Date', style={'display': 'inline-block', 'margin-right':'10'}),
+            dcc.Dropdown(id='enddate1', options=[{'label':x, 'value': x} for x in range(1946, 2020)],style={'margin-right': '35','display': 'inline-block','width':'150'})
+            ], style={'display':'flex'}, id='items'),
+    html.Button('Add new player/team', id='add'),
+    dcc.Checklist(id='stats', labelStyle={'margin-right': '30', 'display': 'inline-block'},style={'width':'1250', 'margin-top':50}, values=[]),
+    html.Button('Graph', id='graph_btn', style={'margin-top':50}),
     html.Div(id='container'),
     ])
+
+
+@app.callback(
+        Output('items','children'),
+        [Input('add','n_clicks')],
+        [State('items', 'children')])
+def addItem(n_clicks, items):
+    global counter
+    if n_clicks is None:
+        raise PreventUpdate
+    else:
+        counter += 1
+        items.append(html.Div([
+            html.Label('Team', style={'display': 'inline-block', 'margin-right':'10'}),
+            dcc.Dropdown(id='drop'+str(counter), multi=False, style={'margin-right': '35','display': 'inline-block', 'width':'300'}),
+            html.Label('Start Date', style={'display': 'inline-block', 'margin-right':'10'}),
+            dcc.Dropdown(id='startdate'+str(counter), options=[{'label':x, 'value': x} for x in range(1946, 2020)], style={'margin-right': '10','display': 'inline-block', 'width':'150'}),
+            html.Label('End Date', style={'display': 'inline-block', 'margin-right':'10'}),
+            dcc.Dropdown(id='enddate'+str(counter), options=[{'label':x, 'value': x} for x in range(1946, 2020)],style={'margin-right': '35','display': 'inline-block','width':'150'})
+            ]))
+    return html.Div(items)
 
 
 @app.callback(
@@ -116,8 +147,8 @@ def setDropDown(selection):
         Output('container', 'children'),
         [Input('graph_btn','n_clicks'),
          Input('drop1', 'value'),
-         Input('stats','values'),
-         Input('teamplayer', 'value')])
+         Input('stats','values')],
+        [State('teamplayer', 'value')])
 def graphStats(n_clicks, id, stat_list, teamplayer):
     global clicks
     if n_clicks == clicks or n_clicks is None:
@@ -129,8 +160,6 @@ def graphStats(n_clicks, id, stat_list, teamplayer):
             id1 = nba.Team(id)
         else:
             id1 = nba.Player(id)
-
-
         objects = [id1]
         graphs = []
         for j in stat_list:
