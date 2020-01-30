@@ -12,8 +12,8 @@ class Team:
         self.teamstats = teamyearbyyearstats.TeamYearByYearStats(id).get_data_frames()[0]
 
     def get_stats(self, stat, start, end):
-        stats_in_range = self.teamstats[self.teamstats['YEAR'] <= end]
-        stats_in_range = stats_in_range[self.teamstats['YEAR'] >= start]
+        stats_in_range = self.teamstats[(self.teamstats['YEAR'] <= end)]
+        stats_in_range = stats_in_range[(self.teamstats['YEAR'] >= start)]
         return stats_in_range.set_index("YEAR")[stat]
 
 
