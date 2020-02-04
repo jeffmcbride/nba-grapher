@@ -28,9 +28,6 @@ team_stats = [
     't_DIV_RANK',
     't_PO_WINS',
     't_PO_LOSSES',
-    't_CONF_COUNT',
-    't_DIV_COUNT',
-    't_NBA_FINALS_APPEARANCE',
     't_FGM',
     't_FGA',
     't_FG_PCT',
@@ -93,6 +90,11 @@ app.layout = html.Div([
     dcc.RadioItems(id='teamplayer', options=[{'label': 'Team',
                    'value': 'team'}, {'label': 'Player',
                    'value': 'player'}], value='team',
+                   labelStyle={'display': 'inline-block',
+                   'margin-right': 10}),
+    dcc.RadioItems(id='permode', options=[{'label': 'Per Game',
+                   'value': 'PerGame'}, {'label': 'Totals',
+                   'value': 'Totals'}], value='PerGame',
                    labelStyle={'display': 'inline-block',
                    'margin-right': 10}),
     html.Div([html.Label('Team', style={'margin-right':'10px'}),
@@ -179,8 +181,9 @@ def setDropDown(selection):
         [Input('graph_btn','n_clicks'),
          Input('items', 'children'),
          Input('stats','value')],
-        [State('teamplayer', 'value')])
-def graphStats(n_clicks, children, stat_list, selection):
+        [State('teamplayer', 'value'),
+         State('permode', 'value')])
+def graphStats(n_clicks, children, stat_list, selection, permode):
     global clicks
     if n_clicks == clicks or n_clicks is None:
         raise PreventUpdate
@@ -193,7 +196,7 @@ def graphStats(n_clicks, children, stat_list, selection):
             i = 1
             while i < len(children):
                 if "value" in children[i]['props'].keys() and "value" in children[i+2]['props'].keys() and "value" in children[i+4]['props'].keys():
-                    ids.append(nba.Team(children[i]['props']['value']))
+                    ids.append(nba.Team(children[i]['props']['value'], permode))
                     start_dates.append(children[i+2]['props']['value'])
                     end_dates.append(children[i+4]['props']['value'])
 
@@ -203,7 +206,7 @@ def graphStats(n_clicks, children, stat_list, selection):
             i = 1
             while i < len(children):
                 if "value" in children[i]['props'].keys() and "value" in children[i+2]['props'].keys() and "value" in children[i+4]['props'].keys():
-                    ids.append(nba.Player(children[i]['props']['value']))
+                    ids.append(nba.Player(children[i]['props']['value'], permode))
                     start_dates.append(children[i+2]['props']['value'])
                     end_dates.append(children[i+4]['props']['value'])
                 i += 6
