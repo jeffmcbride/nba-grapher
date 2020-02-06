@@ -1,7 +1,6 @@
-import plotly
 from nba_api.stats.endpoints import teamyearbyyearstats
 from nba_api.stats.endpoints import playercareerstats
-from nba_api.stats.static import *
+from nba_api.stats.static import teams, players
 
 
 class Team:
@@ -22,7 +21,7 @@ class Player:
     def __init__(self, id, per_mode):
         self.dict = players.find_player_by_id(id)
         self.name = self.dict['full_name']
-        self.playerstats = playercareerstats.PlayerCareerStats(id, per_mode_simple=per_mode).get_data_frames()[0]
+        self.playerstats = playercareerstats.PlayerCareerStats(id, per_mode36=per_mode).get_data_frames()[0]
 
     def get_stats(self, stat, start, end):
         stats_in_range = self.playerstats[self.playerstats['SEASON_ID'] <= end]

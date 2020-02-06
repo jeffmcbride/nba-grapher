@@ -11,7 +11,6 @@ import nba
 
 teamlist = teams.get_teams()
 playerlist = players.get_players()
-teamplayer = 'team'
 
 team_stats_totals = {}
 team_stats_per_game = {}
@@ -92,12 +91,22 @@ app.layout = html.Div([
                    'value': 'Totals'}], value='PerGame',
                    labelStyle={'display': 'inline-block',
                    'margin-right': 10}),
-    html.Div(id='items'),
+
+    html.Div([html.Label('Team1', style={'margin-right':'10px'}),
+            dcc.Dropdown(options=[{'label': i['full_name'], 'value': i['id']} for i in teamlist], style={'margin-right': '35px','display': 'inline-block', 'width':'300px'}),
+            html.Label('Start Date', style={'display': 'inline-block', 'margin-right':'10px'}),
+            dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)], style={'margin-right': '10px','display': 'inline-block', 'width':'150px'}),
+            html.Label('End Date', style={'display': 'inline-block', 'margin-right':'10px'}),
+            dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)],style={'margin-right': '35px','display': 'inline-block','width':'150px'})
+            ], id='items'),
     html.Button('Add new player/team', id='add'),
     dcc.Checklist(id='stats', labelStyle={'margin-right': '30px', 'display': 'inline-block'},style={'width':'1250px', 'margin-top':'50px'}, value=[]),
     html.Button('Graph', id='graph_btn', style={'margin-top':'50px'}),
-    html.Div(id='container'),
+    html.Div(id='graphs'),
     ])
+
+
+teamplayer = 'team'
 
 
 @app.callback(
@@ -110,30 +119,12 @@ def addItem(n_clicks, selection, items):
     global teamplayer
     ret = []
     if n_clicks is None:
-        if (selection == "team"):
-            items = html.Div([html.Label('Team', style={'margin-right':'10px'}),
-                dcc.Dropdown(options=[{'label': i['full_name'], 'value': i['id']} for i in teamlist], style={'margin-right': '35px','display': 'inline-block', 'width':'300px'}),
-                html.Label('Start Date', style={'display': 'inline-block', 'margin-right':'10px'}),
-                dcc.Dropdown(id='startdate1', options=[{'label':x, 'value': x} for x in range(1946, 2021)], style={'margin-right': '10px','display': 'inline-block', 'width':'150px'}),
-                html.Label('End Date', style={'display': 'inline-block', 'margin-right':'10px'}),
-                dcc.Dropdown(id='enddate1', options=[{'label':x, 'value': x} for x in range(1946, 2021)],style={'margin-right': '35px','display': 'inline-block','width':'150px'})
-                ], id='items')
-            teamplayer = 'team'
-        else:
-            items = html.Div([html.Label('Player', style={'margin-right':'10px'}),
-                dcc.Dropdown(options=[{'label': i['full_name'], 'value': i['id']} for i in playerlist], style={'margin-right': '35px','display': 'inline-block', 'width':'300px'}),
-                html.Label('Start Date', style={'display': 'inline-block', 'margin-right':'10px'}),
-                dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)], style={'margin-right': '10px','display': 'inline-block', 'width':'150px'}),
-                html.Label('End Date', style={'display': 'inline-block', 'margin-right':'10px'}),
-                dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)],style={'margin-right': '35px','display': 'inline-block','width':'150px'})
-                ], id='items')
+        raise PreventUpdate
 
-            teamplayer = 'player'
-        return items
     else:
         if (selection == "team"):
             if (teamplayer == "team"):
-                ret.append(html.Label('Team', style={'display':'block', 'margin-right':'10px'}))
+                ret.append(html.Label('TeamN', style={'display':'block', 'margin-right':'10px'}))
                 ret.append(dcc.Dropdown(options=[{'label': i['full_name'], 'value': i['id']} for i in teamlist], style={'margin-right': '35px','display': 'inline-block', 'width':'300px'}))
                 ret.append(html.Label('Start Date', style={'display': 'inline-block', 'margin-right':'10px'}))
                 ret.append(dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)], style={'margin-right': '10px','display': 'inline-block', 'width':'150px'}))
@@ -141,17 +132,17 @@ def addItem(n_clicks, selection, items):
                 ret.append(dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)],style={'margin-right': '35px','display': 'inline-block','width':'150px'}))
                 items = items + ret
             else:
-                items = html.Div([html.Label('Team', style={'margin-right':'10px'}),
+                items = html.Div([html.Label('Team1', style={'margin-right':'10px'}),
                         dcc.Dropdown(options=[{'label': i['full_name'], 'value': i['id']} for i in teamlist], style={'margin-right': '35px','display': 'inline-block', 'width':'300px'}),
                         html.Label('Start Date', style={'display': 'inline-block', 'margin-right':'10px'}),
                         dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)], style={'margin-right': '10px','display': 'inline-block', 'width':'150px'}),
                         html.Label('End Date', style={'display': 'inline-block', 'margin-right':'10px'}),
                         dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)],style={'margin-right': '35px','display': 'inline-block','width':'150px'})
                         ], id='items')
-            teamplayer = 'team'
+                teamplayer = "team"
         else:
             if (teamplayer == "player"):
-                ret.append(html.Label('Player', style={'display':'block', 'margin-right':'10px'}))
+                ret.append(html.Label('PlayerN', style={'display':'block', 'margin-right':'10px'}))
                 ret.append(dcc.Dropdown(options=[{'label': i['full_name'], 'value': i['id']} for i in playerlist], style={'margin-right': '35px','display': 'inline-block', 'width':'300px'}))
                 ret.append(html.Label('Start Date', style={'display': 'inline-block', 'margin-right':'10px'}))
                 ret.append(dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)], style={'margin-right': '10px','display': 'inline-block', 'width':'150px'}))
@@ -159,15 +150,15 @@ def addItem(n_clicks, selection, items):
                 ret.append(dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)],style={'margin-right': '35px','display': 'inline-block','width':'150px'}))
                 items = items + ret
             else:
-                items = html.Div([html.Label('Player', style={'margin-right':'10px'}),
+                items = html.Div([html.Label('Player1', style={'margin-right':'10px'}),
                         dcc.Dropdown(options=[{'label': i['full_name'], 'value': i['id']} for i in playerlist], style={'margin-right': '35px','display': 'inline-block', 'width':'300px'}),
                         html.Label('Start Date', style={'display': 'inline-block', 'margin-right':'10px'}),
                         dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)], style={'margin-right': '10px','display': 'inline-block', 'width':'150px'}),
                         html.Label('End Date', style={'display': 'inline-block', 'margin-right':'10px'}),
                         dcc.Dropdown(options=[{'label':x, 'value': x} for x in range(1946, 2021)],style={'margin-right': '35px','display': 'inline-block','width':'150px'})
                         ], id='items')
-            teamplayer = 'player'
-        return items
+                teamplayer = "player"
+    return items
 
 
 
@@ -184,7 +175,7 @@ def setDropDown(selection):
 
 
 @app.callback(
-        Output('container', 'children'),
+        Output('graphs', 'children'),
         [Input('graph_btn','n_clicks')],
          [State('items', 'children'),
         State('stats','value'),
